@@ -10,13 +10,13 @@ import dobble_utils as db
 # from keras
 model = load_model('dobble_model.h5')
 base_dataset_directory = 'dobble_dataset'
-nrows = 224
-ncols = 224
+nrows = 320
+ncols = 240
 
 nchannels = 3
 
 # predict error bounds
-test_dir = 'dobble_dataset/dobble_test01_cards'
+test_dir = 'new_dataset/exp0-augmented2'
 # test_dir = 'dobble_dataset/dobble_test02_cards'
 
 test_cards = db.get_card_filenames(test_dir)

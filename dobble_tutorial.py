@@ -11,6 +11,7 @@
 #   csv
 #   collections
 #
+import sys
 
 import numpy as np
 import cv2
@@ -25,43 +26,17 @@ import dobble_utils as db
 # Parameters
 #
 
-dir = 'dobble_dataset'
-# dir = './kaggle/input/dobble-card-images'
-# nrows = 146
-# ncols = 146
-nrows = 224
-ncols = 224
-
+dir = 'new_dataset'
+nrows = 240
+ncols = 320
 nchannels = 3
 
 card_decks = [
-    'dobble_deck01_cards_57',
-    'dobble_deck02_cards_55',
-    'dobble_deck03_cards_55',
-    'dobble_deck04_cards_55',
-    'dobble_deck05_cards_55',
-    'dobble_deck06_cards_55',
-    'dobble_deck07_cards_55',
-    'dobble_deck08_cards_55',
-    'dobble_deck09_cards_55',
-    'dobble_deck10_cards_55'
+    'exp0-augmented2'
 ]
 
-# # augmented card decks
-# card_decks = [
-#     'dobble_deck01_cards_57-augmented',
-#     'dobble_deck02_cards_55-augmented',
-#     'dobble_deck03_cards_55-augmented',
-#     'dobble_deck04_cards_55-augmented',
-#     'dobble_deck05_cards_55-augmented',
-#     'dobble_deck06_cards_55-augmented',
-#     'dobble_deck07_cards_55-augmented',
-#     'dobble_deck08_cards_55-augmented',
-#     'dobble_deck09_cards_55-augmented',
-#     'dobble_deck10_cards_55-augmented'
-#     ]
-
 nb_card_decks = len(card_decks)
+
 print("")
 print("PARAMETERS:")
 print("Normalized shape of images :", ncols, " x ", nrows)
@@ -74,7 +49,9 @@ print("Card Decks : ", nb_card_decks, card_decks)
 train_cards = []
 for d in range(0, nb_card_decks):
     train_dir = dir + '/' + card_decks[d]
-    train_cards.append(db.capture_card_filenames(train_dir))
+    filenames = db.get_card_filenames(train_dir)
+    print('filenames:', filenames)
+    train_cards.append(filenames)
 
 gc.collect()
 
@@ -85,6 +62,7 @@ gc.collect()
 
 train_X = []
 train_y = []
+
 for d in range(0, nb_card_decks):
     X, y = db.read_and_process_image(train_cards[d], nrows, ncols)
     train_X.append(np.array(X))
@@ -92,6 +70,13 @@ for d in range(0, nb_card_decks):
 
 train_X = np.concatenate(train_X, axis = 0)
 train_y = np.concatenate(train_y, axis = 0)
+
+print('train_X:', train_X)
+print('train_y:', train_y)
+
+print('size train_X:', sys.getsizeof(train_X))
+print('size train_y:', sys.getsizeof(train_y))
+
 ntrain = len(train_y)
 
 del train_cards
@@ -120,10 +105,10 @@ print("Shape of validation data (y) is :", val_y.shape)
 
 ntrain = len(train_X)
 nval = len(val_X)
-batch_size = 32
-nepochs = 59
+batch_size = 16
+nepochs = 10
 
-import os;
+import os
 
 os.environ['KERAS_BACKEND'] = 'tensorflow'
 from keras import layers
@@ -194,10 +179,10 @@ model.summary()
 test_dir = './dobble_dataset/dobble_test01_cards'
 # test_dir = './dobble_dataset/dobble_test02_cards'
 
-test_cards = db.capture_card_filenames(test_dir)
+test_cards = db.get_card_filenames(test_dir)
 random.shuffle(test_cards)
 
-test_X, test_y = db.read_and_process_image(test_cards, nrows, ncols)
+test_X, test_y = db.read_and_process_image(test_cards, ncols, nrows)
 del test_cards
 
 ntest = len(test_y)

@@ -109,7 +109,6 @@ def load_card_symbol_mapping(mapping_filename):
                 if val == '1':
                     card_mapping.append(i + 1)
             mapping[card_id] = card_mapping
-            #
             card_id = card_id + 1
 
     return mapping

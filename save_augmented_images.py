@@ -8,17 +8,17 @@ from matplotlib import pyplot
 
 import os, shutil
 
-deck = 'dobble_deck07_cards_55'
-dataPath = 'dobble_dataset/' + deck + '/'
+deck = 'exp0'
+dataPath = 'new_dataset/' + deck + '/'
 
-augmentedPath = 'dobble_dataset/' + deck + '-augmented/'
+augmentedPath = 'new_dataset/' + deck + '-augmented2/'
 
 if os.path.exists(augmentedPath):
     shutil.rmtree(augmentedPath)
 os.mkdir(augmentedPath)
 
-total_images_to_augment = 100
-image_size = 300
+total_images_to_augment = 50
+image_size = 100
 
 for folder in os.listdir(dataPath):
     print("[INFO] generating images in folder " + folder)
@@ -32,9 +32,9 @@ for folder in os.listdir(dataPath):
         samples = expand_dims(data, 0)
         # create image data augmentation generator
         datagen = ImageDataGenerator(
-            width_shift_range = 0.3,
-            height_shift_range = 0.3,
-            brightness_range = [0.3, 1.0],
+            width_shift_range = 0.2,
+            height_shift_range = 0.2,
+            brightness_range = [0.2, 1.1],
             zoom_range = [0.7, 1.5]
         )
 
@@ -61,7 +61,7 @@ for folder in os.listdir(dataPath):
 
             # plot raw pixel data
             ax.imshow(image)
-            fig.savefig(fname = outputPath + "card" + folder + "_{:03d}.tif".format(i))
+            fig.savefig(fname = outputPath + "card" + folder + "_{:03d}.tif".format(i), dpi = 50)
             # show the figure
             # pyplot.show()
 

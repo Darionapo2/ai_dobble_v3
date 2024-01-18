@@ -58,7 +58,7 @@ print("Card Decks : ", nb_card_decks, card_decks)
 train_cards = []
 for d in range(0, nb_card_decks):
     train_dir = dir + '/' + card_decks[d]
-    train_cards.append(db.capture_card_filenames(train_dir))
+    train_cards.append(db.get_card_filenames(train_dir))
 
 #
 # Read images and pre-process to fixed size
@@ -86,7 +86,7 @@ print("VIEW CARD DECKS:")
 print("... press any key to continue ...")
 
 for d in range(0, nb_card_decks):
-    collage = db.create_collage(d + 1, train_X[d], train_y[d])
+    collage = db.create_collage(train_X[d], train_y[d])
     title = "Deck %02d" % (d + 1)
     cv2.imshow(title, collage)
     cv2.waitKey(0)
