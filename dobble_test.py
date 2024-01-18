@@ -49,6 +49,7 @@ print(test_dir, ': Test Accuracy =', test_accuracy)
 
 # analysis of the results
 confidence_intervals = [0.5, 0.8, 0.9, 0.95, 0.99]
+
 for conf in confidence_intervals:
     lower_bound, upper_bound = db.get_accuracy_bounds(test_accuracy, test_set_size, conf)
     print(f'{round(conf, 4)} accuracy bound: {round(lower_bound, 4)} - '
