@@ -35,16 +35,16 @@ def read_and_process_image(images, nrows, ncols, labels = True):
         resized_im = cv2.resize(im, (nrows, ncols), interpolation = cv2.INTER_CUBIC)
         X.append(resized_im)
 
-        if labels:
-            # get the integer rappresenting the number of dataset to test.
-            # example: ['dobble_dataset', 'dobble_test01_cards', '02', 'card02_00.tif'] --> 2
-            # and add it into the "y" testing variable
-            y_lst = image_filename.split('/')
-            y.append(int(y_lst[-2]))
+        # get the integer rappresenting the number of dataset to test.
+        # example: ['dobble_dataset', 'dobble_test01_cards', '02', 'card02_00.tif'] --> 2
+        # and add it into the "y" testing variable
+        y_lst = image_filename.split('/')
+        y.append(int(y_lst[-2]))
 
-            return X, y
-        else:
-            return X
+    if labels:
+        return X, y
+    else:
+        return X
 
 # Load Symbol labels and Card-Symbol mapping
 def load_symbol_labels(symbol_filename):

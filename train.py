@@ -1,4 +1,6 @@
 import gc, os
+import pprint
+
 import numpy as np
 import dobble_utils as db
 from keras import layers, models
@@ -13,7 +15,7 @@ nrows = 240
 ncols = 320
 nchannels = 3
 
-card_decks = ['exp0-augmented2']
+card_decks = ['exp0-augmented3']
 
 nb_card_decks = len(card_decks)
 
@@ -44,10 +46,12 @@ def main():
 
     model = create_model()
 
-    entrenador_automatico(
+    history = entrenador_automatico(
         model, train_X, train_y, val_X, val_y,
-        batch_size = 16, nepochs = 10
+        batch_size = 16, nepochs = 5
     )
+
+    print(history)
 
 
 # Capture images/labels from data set for training and testing
@@ -69,6 +73,7 @@ def build_dataset(train_cards):
 
     for d in range(0, nb_card_decks):
         X, y = db.read_and_process_image(train_cards[d], nrows, ncols)
+        print(X) # CONTROLLARE BENE IL COMPORTAMENTO DI QUESTA FUNZIONE
         all_X.append(np.array(X))
         all_y.append(np.array(y))
 
@@ -79,7 +84,7 @@ def build_dataset(train_cards):
     del train_cards
     gc.collect()
 
-    return all_X, all_y, n_train
+    return all_X[0], all_y, n_train
 
 
 def create_model():
@@ -117,8 +122,8 @@ def create_model():
 
 
 def entrenador_automatico(model, train_X, train_y, val_X, val_y, batch_size, nepochs):
-    ntrain = len(train_X)
-    nval = len(val_X)
+    n_train = len(train_X)
+    n_val = len(val_X)
 
     train_datagen = ImageDataGenerator(
         rescale = 1.0 / 255,
@@ -135,10 +140,10 @@ def entrenador_automatico(model, train_X, train_y, val_X, val_y, batch_size, nep
     # The actual model training
     history = model.fit(
         train_generator,
-        steps_per_epoch = int(ntrain / batch_size),
+        steps_per_epoch = int(n_train / batch_size),
         epochs = nepochs,
         validation_data = val_generator,
-        validation_steps = int(nval / batch_size)
+        validation_steps = int(n_val / batch_size)
     )
 
     model.save_weights('dobble_model_weights.h5')
