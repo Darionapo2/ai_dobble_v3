@@ -1,56 +1,67 @@
-# script to test the accuracy of your model and give error bounds
-import math
 import numpy as np
 from keras.models import load_model
 from keras.utils import to_categorical
-
 import dobble_utils as db
 
-# open the Dobble model
-# from keras
 model = load_model('dobble_model.h5')
 base_dataset_directory = 'dobble_dataset'
+
 nrows = 320
 ncols = 240
-
 nchannels = 3
 
-# predict error bounds
-test_dir = 'new_dataset/exp0-augmented2'
-# test_dir = 'dobble_dataset/dobble_test02_cards'
+def main():
+    jugador_de_dobble('new_dataset/test/test_cards/01_card_exp0.jpg',
+                      'new_dataset/test/test_cards/09_card_exp0.jpg')
 
-test_cards = db.get_card_filenames(test_dir)
-test_set_size = len(test_cards)
+def test_accuracy(test_dir):
+    test_cards = db.get_card_filenames(test_dir)
+    test_set_size = len(test_cards)
 
-np.random.shuffle(test_cards)
+    np.random.shuffle(test_cards)
 
-test_X, test_y = db.read_and_process_image(test_cards, nrows, ncols)
-# del test_cards
+    test_X, test_y = db.read_and_process_image(test_cards, nrows, ncols, labels = True)
+    del test_cards
 
-n_test = len(test_y)
-test_X = np.array(test_X)
-test_y = np.array(test_y)
+    n_test = len(test_y)
+    test_X = np.array(test_X)
+    test_y = np.array(test_y)
 
-# element-wise normalization
-test_X = test_X * (1.0 / 255)
+    # element-wise normalization
+    test_X = test_X / 255.0
 
-# convert labels in range 0-57 to one-hot encoding
-# from keras
-test_y = to_categorical(test_y, 58)
+    test_y = to_categorical(test_y, 30)
 
-print('Shape of test data (X):', test_X.shape)
-print('Shape of test data (y):', test_y.shape)
+    model.evaluate(test_X, test_y)
+    accuracy = db.test_accuracy(model, n_test, test_X, test_y)
 
-print('\nEVALUATE MODEL:')
-model.evaluate(test_X, test_y)
+    return test_set_size, test_X.shape, test_y.shape, accuracy
 
-test_accuracy = db.test_accuracy(model, n_test, test_X, test_y)
-print(test_dir, ': Test Accuracy =', test_accuracy)
+def jugador_de_dobble(card1_dir, card2_dir):
+    mapping = db.load_card_symbol_mapping('new_dataset/cards_symbols_mapping.csv')
+    labels = db.load_symbol_labels('new_dataset/deck_symbols.csv')
 
-# analysis of the results
-confidence_intervals = [0.5, 0.8, 0.9, 0.95, 0.99]
+    images_X = db.read_and_process_image(
+        [card1_dir, card2_dir],
+        nrows, ncols,
+        labels = False)
 
-for conf in confidence_intervals:
-    lower_bound, upper_bound = db.get_accuracy_bounds(test_accuracy, test_set_size, conf)
-    print(f'{round(conf, 4)} accuracy bound: {round(lower_bound, 4)} - '
-          f'{round(upper_bound, 4)}')
+    card1_x = np.array([images_X[0]])
+    card2_x = np.array([images_X[1]])
+
+    prediction1 = model.predict(card1_x)[0]
+    prediction2 = model.predict(card2_x)[0]
+
+    result1 = list(prediction1).index(max(prediction1))
+    result2 = list(prediction2).index(max(prediction2))
+
+    v1 = set(mapping[result1])
+    v2 = set(mapping[result2])
+
+    symbol_id = int(list(v1 & v2)[0])
+
+    return labels[symbol_id]
+
+if __name__ == '__main__':
+    main()
+

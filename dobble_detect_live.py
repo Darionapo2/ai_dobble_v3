@@ -179,6 +179,7 @@ while True:
                     try:
                         # dobble pre-processing
                         card_img = cv2.resize(roi, (224, 224), interpolation = cv2.INTER_CUBIC)
+                        print(card_img)
                         card_img = card_img / 255.0
                         card_x = [card_img]
                         card_x = np.array(card_x)

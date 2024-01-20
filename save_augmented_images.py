@@ -32,10 +32,10 @@ for folder in os.listdir(dataPath):
         samples = expand_dims(data, 0)
         # create image data augmentation generator
         datagen = ImageDataGenerator(
-            width_shift_range = 0.2,
-            height_shift_range = 0.2,
+            width_shift_range = 0.1,
+            height_shift_range = 0.1,
             brightness_range = [0.2, 1.1],
-            zoom_range = [0.7, 1.5]
+            zoom_range = [0.7, 1.3]
         )
 
         # prepare iterator

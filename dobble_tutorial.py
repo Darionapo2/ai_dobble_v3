@@ -1,25 +1,7 @@
-#
-# Dobble Buddy - Training tutorial
-#
-# References:
-#   https://www.kaggle.com/grouby/dobble-card-images
-#
-# Dependencies:
-#   numpy
-#   cv2
-#   os
-#   csv
-#   collections
-#
 import sys
-
 import numpy as np
-import cv2
-
-import os
 import random
 import gc
-
 import dobble_utils as db
 
 #
@@ -71,6 +53,9 @@ for d in range(0, nb_card_decks):
 train_X = np.concatenate(train_X, axis = 0)
 train_y = np.concatenate(train_y, axis = 0)
 
+print('shape train_X:', train_X.shape)
+print('shape train_y:', train_y.shape)
+
 print('train_X:', train_X)
 print('train_y:', train_y)
 
@@ -119,8 +104,8 @@ from keras.preprocessing.image import ImageDataGenerator
 from keras.preprocessing.image import img_to_array, load_img
 
 # convert labels in range 0-57 to one-hot encoding
-train_y = to_categorical(train_y, 58)
-val_y = to_categorical(val_y, 58)
+train_y = to_categorical(train_y, 30)
+val_y = to_categorical(val_y, 30)
 
 model = models.Sequential()
 model.add(layers.Conv2D(32, (3, 3), activation = 'relu', input_shape = (nrows, ncols, nchannels)))
@@ -135,7 +120,7 @@ model.add(layers.Dropout(0.5))
 model.add(layers.Flatten())
 model.add(layers.Dense(512))
 model.add(layers.Activation('relu'))
-model.add(layers.Dense(58))
+model.add(layers.Dense(30))
 model.add(layers.Activation('softmax'))
 
 model.compile(loss = 'categorical_crossentropy', optimizer = 'adam')
@@ -194,7 +179,7 @@ test_y = np.array(test_y)
 test_X = test_X * (1. / 255)
 
 # convert labels in range 0-57 to one-hot encoding
-test_y = to_categorical(test_y, 58)
+test_y = to_categorical(test_y, 30)
 
 print("Shape of test data (X) is :", test_X.shape)
 print("Shape of test data (y) is :", test_y.shape)
