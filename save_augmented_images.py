@@ -1,51 +1,55 @@
-# example of combination image augmentation
 from numpy import expand_dims
 from keras.preprocessing.image import load_img
 from keras.preprocessing.image import img_to_array
 from keras.preprocessing.image import ImageDataGenerator
 from matplotlib import pyplot
-# import matplotlib
-
 import os, shutil
 
 deck = 'exp0'
-dataPath = 'new_dataset/' + deck + '/'
+data_path = f'new_dataset/{deck}/'
 
-augmentedPath = 'new_dataset/' + deck + '-augmented2/'
+augmented_imgs_path = f'new_dataset/{deck}-augmented2/'
 
-if os.path.exists(augmentedPath):
-    shutil.rmtree(augmentedPath)
-os.mkdir(augmentedPath)
+if os.path.exists(augmented_imgs_path):
+    shutil.rmtree(augmented_imgs_path)
+os.mkdir(augmented_imgs_path)
 
 total_images_to_augment = 50
 image_size = 100
 
-for folder in os.listdir(dataPath):
-    print("[INFO] generating images in folder " + folder)
+width_shift_range = 0.1
+height_shift_range = 0.1
+brightness_range = [0.2, 1.1]
+zoom_range = [0.7, 1.3]
 
-    for file in os.listdir(dataPath + '/' + folder):
+for folder in os.listdir(data_path):
+    print(f'[INFO] generating images in folder{folder}')
+
+    for file in os.listdir(f'{data_path}/{folder}'):
+
         # load each image
-        img = load_img(dataPath + '/' + folder + '/' + file)
+        img = load_img(f'{data_path}/{folder}/{file}')
         # convert to numpy array
         data = img_to_array(img)
         # expand dimension to one sample
         samples = expand_dims(data, 0)
+
         # create image data augmentation generator
         datagen = ImageDataGenerator(
-            width_shift_range = 0.1,
-            height_shift_range = 0.1,
-            brightness_range = [0.2, 1.1],
-            zoom_range = [0.7, 1.3]
+            width_shift_range = width_shift_range,
+            height_shift_range = height_shift_range,
+            brightness_range = brightness_range,
+            zoom_range = zoom_range
         )
 
         # prepare iterator
         it = datagen.flow(samples, batch_size = 1)
 
-        outputPath = augmentedPath + folder + '/'
+        output_path = f'{augmented_imgs_path}{folder}/'
 
-        if os.path.exists(outputPath):
-            shutil.rmtree(outputPath)
-        os.mkdir(outputPath)
+        if os.path.exists(output_path):
+            shutil.rmtree(output_path)
+        os.mkdir(output_path)
 
         for i in range(1, total_images_to_augment + 1):
             # generate batch of images
@@ -54,16 +58,14 @@ for folder in os.listdir(dataPath):
             image = batch[0].astype('uint8')
 
             fig = pyplot.figure(frameon = False)
-            # fig.set_size_inches(w,h)
             ax = pyplot.Axes(fig, [0., 0., 1., 1.])
             ax.set_axis_off()
             fig.add_axes(ax)
 
             # plot raw pixel data
             ax.imshow(image)
-            fig.savefig(fname = outputPath + "card" + folder + "_{:03d}.tif".format(i), dpi = 50)
-            # show the figure
-            # pyplot.show()
+            saved_filename = f'{output_path}card{folder}' + '_{:03d}.tif'.format(i)
+            fig.savefig(fname = saved_filename, dpi = 50)
 
-            # the figure will remain open, using memory, open unless explicitly closed with the following: (you'll get a warning if you don't include it)
+            # the figure will remain open, using memory, unless explicitly closed
             pyplot.close('all')
