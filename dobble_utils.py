@@ -38,8 +38,9 @@ def read_and_process_image(images, nrows, ncols, labels = True):
         # get the integer rappresenting the number of dataset to test.
         # example: ['dobble_dataset', 'dobble_test01_cards', '02', 'card02_00.tif'] --> 2
         # and add it into the "y" testing variable
-        y_lst = image_filename.split('/')
-        y.append(int(y_lst[-2]))
+        if labels:
+            y_lst = image_filename.split('/')
+            y.append(int(y_lst[-2]))
 
     if labels:
         return X, y

@@ -1,12 +1,14 @@
 import gc, os
 import pprint
-
+import sys
 import numpy as np
 import dobble_utils as db
 from keras import layers, models
 from keras.utils import to_categorical
 from keras.preprocessing.image import ImageDataGenerator
 from sklearn.model_selection import train_test_split
+
+np.set_printoptions(threshold = sys.maxsize)
 
 os.environ['KERAS_BACKEND'] = 'tensorflow'
 
@@ -40,15 +42,18 @@ def main():
     print('Shape of validation data (val_X):', val_X.shape)
     print('Shape of validation data (val_y):', val_y.shape)
 
-    # convert labels in range 0-29 to one-hot encoding
-    train_y = to_categorical(train_y, 30)
-    val_y = to_categorical(val_y, 30)
+    # convert labels in range 0-28 to one-hot encoding
+    print(train_y)
+    train_y = to_categorical(train_y, 29)
+    val_y = to_categorical(val_y, 29)
+
+    print(train_y)
 
     model = create_model()
 
     history = entrenador_automatico(
         model, train_X, train_y, val_X, val_y,
-        batch_size = 16, nepochs = 5
+        batch_size = 17, nepochs = 5
     )
 
     print(history)
@@ -73,18 +78,21 @@ def build_dataset(train_cards):
 
     for d in range(0, nb_card_decks):
         X, y = db.read_and_process_image(train_cards[d], nrows, ncols)
-        print(X) # CONTROLLARE BENE IL COMPORTAMENTO DI QUESTA FUNZIONE
         all_X.append(np.array(X))
         all_y.append(np.array(y))
 
     all_X = np.concatenate(all_X, axis = 0)
     all_y = np.concatenate(all_y, axis = 0)
+
+    # All labels are shifted of 1 number because we want the first class (card 1) to be 0.
+    all_y = np.subtract(all_y, 1)
+
     n_train = len(all_y)
 
     del train_cards
     gc.collect()
 
-    return all_X[0], all_y, n_train
+    return all_X, all_y, n_train
 
 
 def create_model():
@@ -146,8 +154,8 @@ def entrenador_automatico(model, train_X, train_y, val_X, val_y, batch_size, nep
         validation_steps = int(n_val / batch_size)
     )
 
-    model.save_weights('dobble_model_weights.h5')
-    model.save('dobble_model.h5')
+    model.save_weights('dobble_model_weights9.h5')
+    model.save('dobble_model9.h5')
 
     return history
 
