@@ -53,7 +53,7 @@ def main():
 
     history = entrenador_automatico(
         model, train_X, train_y, val_X, val_y,
-        batch_size = 17, nepochs = 5
+        batch_size = 18, nepochs = 5
     )
 
     print(history)

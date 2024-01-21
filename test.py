@@ -17,7 +17,7 @@ def main():
         'new_dataset/exp0/06/06_card_exp0.jpg'
     )
 
-    print(common_symbol)
+    print('The symbol in common in the 2 given cards is:', common_symbol)
 
     test_set_size, shape_test_X, shape_test_y, accuracy = test_accuracy('new_dataset/exp0')
     print('Accuracy:', accuracy)
@@ -51,11 +51,13 @@ def classify(card_dir):
     image_X = db.read_and_process_image(
         [card_dir],
         nrows, ncols,
-        labels = False)
+        labels = False
+    )
 
     card_x = np.array([image_X[0]])
-    prediction1 = model.predict(card_x)[0]
-    result = list(prediction1).index(max(prediction1))
+
+    prediction = model.predict(card_x)[0]
+    result = list(prediction).index(max(prediction))
 
     return result
 

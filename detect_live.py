@@ -1,29 +1,13 @@
-#
-# Dobble Budday - Detection/Classification (live with USB camera)
-#
-# References:
-#   https://www.kaggle.com/grouby/dobble-card-images
-#
-# Dependencies:
-#
-
-
 import numpy as np
 import cv2
 import os
-from datetime import datetime
 import itertools
-
-import keras
 from keras.models import load_model
-from keras.utils import to_categorical
-
 from imutils.video import FPS
-
 import dobble_utils as db
 
 # Parameters (tweaked for video)
-dir = 'dobble_dataset'
+dir = 'new_dataset'
 
 scale = 1.0
 
@@ -51,7 +35,7 @@ input_video = 0  # laptop camera
 displayReference = True
 
 captureAll = False
-output_dir = './output'
+output_dir = '/output'
 
 if not os.path.exists(output_dir):
     os.mkdir(output_dir)  # Create the output directory if it doesn't already exist
@@ -88,16 +72,16 @@ frame_height = int(round(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))
 print("camera", input_video, " (", frame_width, ",", frame_height, ")")
 
 # Open dobble model
-model = load_model('dobble_model.h5')
+model = load_model('dobble_model8.h5')
 
 # Load reference images
-train1_dir = dir + '/dobble_deck01_cards_57'
+train1_dir = dir + '/exp0'
 train1_cards = db.get_card_filenames(train1_dir)
 train1_X, train1_y = db.read_and_process_image(train1_cards, 72, 72)
 
 # Load mapping/symbol databases
-symbols = db.load_symbol_labels(dir + '/dobble_symbols.txt')
-mapping = db.load_card_symbol_mapping(dir + '/dobble_card_symbol_mapping.txt')
+symbols = db.load_symbol_labels(dir + '/deck_symbols.csv')
+mapping = db.load_card_symbol_mapping(dir + '/cards_symbols_mapping.csv')
 
 print("================================")
 print("Dobble Classification Demo:")
@@ -177,12 +161,12 @@ while True:
                     cv2.rectangle(output, (x1, y1), (x2, y2), (0, 0, 255), 2)
 
                     try:
-                        # dobble pre-processing
-                        card_img = cv2.resize(roi, (224, 224), interpolation = cv2.INTER_CUBIC)
-                        print(card_img)
+                        # pre-processing
+                        card_img = cv2.resize(roi, (320, 240), interpolation = cv2.INTER_CUBIC)
                         card_img = card_img / 255.0
-                        card_x = [card_img]
-                        card_x = np.array(card_x)
+
+                        cv2.imshow('im_preprocessed', card_img)
+                        card_x = np.array([card_img])
                         # dobble model execution
                         card_y = model.predict(card_x)
                         # dobble post-processing
