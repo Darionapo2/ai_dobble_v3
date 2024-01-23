@@ -4,6 +4,10 @@ import os
 import csv
 from collections import OrderedDict
 
+# provides useful functions for loading image data, labels and mappings between charts,
+# and includes a function to evaluate the accuracy of a model in a test set.
+
+
 # Capture images and labels from the dataset
 def get_card_filenames(directory_name):
     # get the list of sub-folders for the selected directory
@@ -83,14 +87,17 @@ def test_accuracy(model, test_n, test_X, test_y):
     ncorrect = 0
     predictions = model.predict(test_X)
 
+    # for all predictions, count how many of them were correct
     for i in range(test_n):
+        # true labels for the current prediction
         y = test_y[i, :]
         pred = predictions[i, :]
         max_y = np.argmax(y)
         max_pred = np.argmax(pred)
         ntotal += 1
 
+        # check if the predicted value is the same as the true one
         if max_pred == max_y:
             ncorrect += 1
-
+    # return a ratio between the correct anc the total prediction
     return ncorrect / ntotal

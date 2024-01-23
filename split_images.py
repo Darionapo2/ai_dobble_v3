@@ -3,6 +3,9 @@ from PIL import Image
 import numpy as np
 from matplotlib import pyplot as plt
 
+
+# Simple script that allow us to grid-crop our scans for the collection of same-sized images in
+# the dataset
 def generate_imgs():
 
     high_res_path = 'dobble_dataset/new_dataset/pdf_scans/high_resolution'
@@ -17,6 +20,8 @@ def generate_imgs():
                 im_ndarray = np.array(im)
 
                 if img_filename.startswith('scan1'):
+                    # get the size of each square cut by dividing the size of the page by the
+                    # number of cards in each row or column for that page
                     M = round(im.size[0]/3)
                     N = round(im.size[1]/2)
                 else:
@@ -26,6 +31,8 @@ def generate_imgs():
                 tiles = []
                 for x in range(0, im_ndarray.shape[0], M):
                     for y in range(0, im_ndarray.shape[1], N):
+                        # by encoding the whole page as a 3-dimentional matrix we can slice it in
+                        # many cards and append all the cards obtained in a list
                         tiles.append(im_ndarray[x: x + M, y: y + N])
 
                 exp = img_filename.split('_')[1].split('.')[0]
@@ -37,6 +44,8 @@ def generate_imgs():
                     i += 1
                     plt.imshow(tile, interpolation = 'nearest')
                     plt.axis('off')
+
+                    # saves all cards at high quality
                     plt.savefig(f'dobble_dataset/new_dataset/saved_images/{exp}'
                                 f'/{i}_{base_filename}.jpg',
                                 bbox_inches = 'tight',
@@ -45,6 +54,8 @@ def generate_imgs():
 
 
 
+# scripts that renumerate all folders generated --> the number assigned at each folder are
+# importants because they will be the labels of each card.
 def renumerate(path):
     files = os.listdir(path)
     files.sort(reverse = False, key = lambda x: int(x.split('_')[0]))
